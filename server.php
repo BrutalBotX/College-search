@@ -101,31 +101,53 @@ if (isset($_POST['login_user'])) {
 // SEARCH COLLEGES
 if (isset($_GET["search"])) { 
   $search = mysqli_real_escape_string($db, $_GET["search"]);
-  
-  $query = "SELECT * FROM college WHERE college_name LIKE '%$search%' OR university LIKE '%$search%'";
+  $gender = isset($_GET['gender']) ? $_GET['gender'] : [];
+  $campus_size = isset($_GET['campus_size']) ? $_GET['campus_size'] : [];
+  $college_type = isset($_GET['college_type']) ? $_GET['college_type'] : [];
+
+  // Base query
+  $query = "SELECT * FROM college WHERE (college_name LIKE '%$search%' OR university LIKE '%$search%')";
+
+  // Add gender filter
+  if (!empty($gender)) {
+      $gender_filter = implode("','", $gender);
+      $query .= " AND genders_accepted IN ('$gender_filter')";
+  }
+
+  // Add campus size filter
+  if (!empty($campus_size)) {
+      $size_filter = implode("','", $campus_size);
+      $query .= " AND campus_size IN ('$size_filter')";
+  }
+
+  // Add college type filter
+  if (!empty($college_type)) {
+      $type_filter = implode("','", $college_type);
+      $query .= " AND college_type IN ('$type_filter')";
+  }
+
   $result = mysqli_query($db, $query);
-  
   $result_check = mysqli_num_rows($result);
 
   if ($result_check > 0) {
-      echo "<div class='container mt-4'>";
-      echo "<div class='row'>";
-      
-      while ($row = mysqli_fetch_assoc($result)) {
-          // Wrap the entire card in an anchor tag
-          echo "<div class='col-md-3 mb-4 d-flex align-items-stretch'>"; // Equal-sized cards with flexbox
-          echo "<a href='college_details.php?college_name=" . urlencode($row['college_name']) . "' class='card text-center' style='min-width: 200px; min-height: 200px; text-decoration: none; color: inherit;'>"; // Link to college_details.php
-          echo "<div class='card-body d-flex flex-column justify-content-center'>"; // Center content vertically
-          echo "<h4 class='card-title'>" . $row['college_name'] . "</h4>"; // Use h4 for title
-          echo "<p class='card-text'><strong>University:</strong> " . $row['university'] . "</p>";
-          echo "<p class='card-text'><strong>City:</strong> " . $row['city'] . "</p>";
-          echo "</div>"; // card-body
-          echo "</a>"; // Closing anchor tag
-          echo "</div>"; // col-md-3
-      }
-      
-      echo "</div>"; // row
-      echo "</div>"; // container
+    echo "<div class='container mt-4'>";
+    echo "<div class='row'>";
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Wrap the entire card in an anchor tag
+        echo "<div class='col-md-3 mb-4 d-flex align-items-stretch'>"; // Equal-sized cards with flexbox
+        echo "<a href='college_details.php?college_name=" . urlencode($row['college_name']) . "' class='card text-center' style='min-width: 200px; min-height: 200px; text-decoration: none; color: inherit;'>"; // Link to college_details.php
+        echo "<div class='card-body d-flex flex-column justify-content-center'>"; // Center content vertically
+        echo "<h4 class='card-title'>" . $row['college_name'] . "</h4>"; // Use h4 for title
+        echo "<p class='card-text'><strong>University:</strong> " . $row['university'] . "</p>";
+        echo "<p class='card-text'><strong>City:</strong> " . $row['city'] . "</p>";
+        echo "</div>"; // card-body
+        echo "</a>"; // Closing anchor tag
+        echo "</div>"; // col-md-3
+    }
+    
+    echo "</div>"; // row
+    echo "</div>"; // container
   } else {
       echo "<div class='alert alert-warning' role='alert'>No colleges found matching your search.</div>";
   }
