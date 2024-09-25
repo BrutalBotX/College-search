@@ -99,53 +99,135 @@ if (isset($_POST['login_user'])) {
   }
 }*/
 // SEARCH COLLEGES
-if (isset($_GET["search"])) { 
+// SEARCH COLLEGES WITH PAGINATION
+if (isset($_GET["search"])) {
   $search = mysqli_real_escape_string($db, $_GET["search"]);
   $gender = isset($_GET['gender']) ? $_GET['gender'] : [];
   $campus_size = isset($_GET['campus_size']) ? $_GET['campus_size'] : [];
   $college_type = isset($_GET['college_type']) ? $_GET['college_type'] : [];
+  $college_type = isset($_GET['college_type']) ? $_GET['college_type'] : [];
+  $fees_range = isset($_GET['fees_range']) ? (int)$_GET['fees_range'] : null; // Get fees range
+  $selected_facilities = isset($_GET['facilities']) ? $_GET['facilities'] : []; // Get facilities
+  $selected_state = isset($_GET['state']) ? mysqli_real_escape_string($db, $_GET['state']) : null; // Get selected state
+  $course = mysqli_real_escape_string($db, $_GET["course"]);
+
+
+  // Pagination variables
+  $results_per_page = 12; // Limit the number of results per page
+  $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+  $offset = ($current_page - 1) * $results_per_page;
 
   // Base query
   $query = "SELECT * FROM college WHERE (college_name LIKE '%$search%' OR university LIKE '%$search%')";
+
+
+  if (!empty($course)) {
+    $query .= " AND courses LIKE '%$course%' ";
+  }
 
   // Add gender filter
   if (!empty($gender)) {
       $gender_filter = implode("','", $gender);
       $query .= " AND genders_accepted IN ('$gender_filter')";
   }
+
   // Add college type filter
   if (!empty($college_type)) {
       $type_filter = implode("','", $college_type);
       $query .= " AND college_type IN ('$type_filter')";
   }
 
+   // Add fees range filter
+   if ($fees_range !== null) {
+    $query .= " AND average_fees <= $fees_range"; // Assuming 'fees' is the column name in your database
+}
+
+// Add state filter
+if ($selected_state) {
+    $query .= " AND state = '$selected_state'"; // Assuming 'state' is the column name in your database
+}
+
+// Add facilities filter
+if (!empty($selected_facilities)) {
+  $facility_conditions = [];
+  foreach ($selected_facilities as $facility) {
+      $facility_conditions[] = "facilities LIKE '%" . mysqli_real_escape_string($db, $facility) . "%'";
+  }
+  $query .= " AND (" . implode(" OR ", $facility_conditions) . ")";
+}
+  // Get total number of results before pagination
   $result = mysqli_query($db, $query);
+  if (!$result) {
+    die("Database query failed: " . mysqli_error($db)); // Error handling
+}
+  $total_results = mysqli_num_rows($result);
+
+  // Modify query to limit the results based on the current page
+  $query .= " LIMIT $offset, $results_per_page";
+
+  $result = mysqli_query($db, $query);
+  if (!$result) {
+    die("Database query failed: " . mysqli_error($db)); // Error handling
+}
   $result_check = mysqli_num_rows($result);
 
   if ($result_check > 0) {
     echo "<div class='container mt-4'>";
-    echo "<div class='row'>";
+    echo "<div class='row' style='margin-top: 100px;'>";
     
+    $index = 0; // Initialize index
     while ($row = mysqli_fetch_assoc($result)) {
-        // Wrap the entire card in an anchor tag
+        // Determine the background color class based on index
+        $bg_class = $index % 2 == 0 ? 'card-light-gray' : 'card-alternate-color'; // Alternate classes
+    
         echo "<div class='col-md-3 mb-4 d-flex align-items-stretch'>"; // Equal-sized cards with flexbox
-        echo "<a href='college_details.php?college_name=" . urlencode($row['college_name']) . "' class='card text-center' style='min-width: 200px; min-height: 200px; text-decoration: none; color: inherit;'>"; // Link to college_details.php
+        echo "<a href='college_details.php?college_name=" . urlencode($row['college_name']) . "' class='card text-center $bg_class' style='min-width: 200px; min-height: 200px; text-decoration: none; color: inherit;'>"; // Link to college_details.php
         echo "<div class='card-body d-flex flex-column justify-content-center'>"; // Center content vertically
         echo "<h4 class='card-title'>" . $row['college_name'] . "</h4>"; // Use h4 for title
         echo "<p class='card-text'><strong>University:</strong> " . $row['university'] . "</p>";
         echo "<p class='card-text'><strong>City:</strong> " . $row['city'] . "</p>";
         echo "</div>"; // card-body
         echo "</a>"; // Closing anchor tag
-        echo "</div>"; // col-md-3
+        echo "</div>";
+    
+        $index++; // Increment index for next iteration
     }
     
     echo "</div>"; // row
-    echo "</div>"; // container
+    echo "</div>";
+
+      // Pagination navigation
+      $total_pages = ceil($total_results / $results_per_page);
+
+      if ($total_pages > 1) {
+          echo "<nav aria-label='Page navigation'>";
+          echo "<ul class='pagination justify-content-center mt-4'>";
+
+          // Previous button
+          if ($current_page > 1) {
+              $prev_page = $current_page - 1;
+              echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$prev_page'>Previous</a></li>";
+          }
+
+          // Page numbers
+          for ($i = 1; $i <= $total_pages; $i++) {
+              if ($i == $current_page) {
+                  echo "<li class='page-item active'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
+              } else {
+                  echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
+              }
+          }
+
+          // Next button
+          if ($current_page < $total_pages) {
+              $next_page = $current_page + 1;
+              echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$next_page'>Next</a></li>";
+          }
+
+          echo "</ul>";
+          echo "</nav>";
+      }
   } else {
       echo "<div class='alert alert-warning' role='alert'>No colleges found matching your search.</div>";
   }
 }
-
-
-
-?>
