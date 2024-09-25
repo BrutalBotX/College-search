@@ -51,7 +51,7 @@ if (isset($_POST['reg_user'])) {
   	mysqli_query($db, $query);
   	$_SESSION['username'] = $username;
   	$_SESSION['success'] = "You are now logged in";
-  	header('location: index.php');
+  	header('location: search.php');
   }
 }
 
@@ -74,7 +74,7 @@ if (isset($_POST['login_user'])) {
   	if (mysqli_num_rows($results) == 1) {
   	  $_SESSION['username'] = $username;
   	  $_SESSION['success'] = "You are now logged in";
-  	  header('location: index.php');
+  	  header('location: search.php');
   	}else {
   		array_push($errors, "Wrong username/password combination");
   	}
@@ -113,13 +113,6 @@ if (isset($_GET["search"])) {
       $gender_filter = implode("','", $gender);
       $query .= " AND genders_accepted IN ('$gender_filter')";
   }
-
-  // Add campus size filter
-  if (!empty($campus_size)) {
-      $size_filter = implode("','", $campus_size);
-      $query .= " AND campus_size IN ('$size_filter')";
-  }
-
   // Add college type filter
   if (!empty($college_type)) {
       $type_filter = implode("','", $college_type);
