@@ -2,8 +2,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Registration system PHP and MySQL</title>
+  <title>Registration page</title>
   <link rel="stylesheet" type="text/css" href="style.css">
+  <style>
+		 body {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Corpus_Christi_College_New_Court%2C_Cambridge%2C_UK_-_Diliff.jpg/1920px-Corpus_Christi_College_New_Court%2C_Cambridge%2C_UK_-_Diliff.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+		</style>
 </head>
 <body>
   <div class="header">

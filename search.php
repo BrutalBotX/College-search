@@ -36,8 +36,15 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     margin-bottom: 20px;
+    margin-top: 50px;
+    background: rgba(231, 225, 40, 0.8);
+
 }
 
+.bg-light {
+  background-color: #d1ecf1;
+
+}
 .alert-success {
     background-color: #d4edda;
     border-color: #c3e6cb;
@@ -62,7 +69,7 @@ form {
 }
 
 input {
-  width: 90%;
+  width: 70%;
   height: 50px;
   background: transparent;
   border: 0;
@@ -72,10 +79,19 @@ input {
   margin-left: 40px;
 }
 
+.row {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  margin-left: -40px;
+  margin-top: -70;
+}
+
 button {
   background: transparent;
   border: 0px;
   outline: 0px;
+  margin-left: 20px;
 }
 
 .form-check-label {
@@ -86,7 +102,8 @@ button {
 
 .form-control {
   width: 90%;
-  border: none;
+  border: 2px;
+  border-color: black;
 }
 
 button .fa-solid {
@@ -94,7 +111,7 @@ button .fa-solid {
   color: #555;
   font-size: 22px;
   cursor: pointer;
-  margin-left: 5px;
+  margin-left: 0px;
 }
 
 .result-box ul {
@@ -116,8 +133,12 @@ button .fa-solid {
 }
 
 .notification-container {
-    margin-top: auto; /* Push to the bottom */
-    padding: 10px; /* Optional padding */
+  margin-top: auto;
+  padding: 10px;
+  right: 0px;
+  position: fixed;
+  bottom: 0px;
+
 }
 
 .alert {
@@ -186,8 +207,7 @@ button .fa-solid {
         <?php include('errors.php'); ?>
         <div class="search-box">
     <div class="row">
-        <input type="text" name="search" class="form-control" placeholder="Search for Colleges" autocomplete="off" required>
-        <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        <input type="text" name="search" class="form-control" placeholder="Search for Colleges" autocomplete="off">
     </div>
     
 </div>
@@ -256,9 +276,9 @@ button .fa-solid {
                 <div id="collapseFees" class="collapse">
                     <div class="card-body">
                         <label for="feesRange">Fees Range:</label>
-                        <input type="range" class="form-range" id="feesRange" name="fees_range" min="0" max="1000000" step="10000"
+                        <input type="range" class="form-range" id="feesRange" name="fees_range" min="0" max="1000000" step="10000" value="1000000"
                             oninput="this.nextElementSibling.value = this.value">
-                        <output>500000</output> <!-- Default output value -->
+                        <output>1000000</output> <!-- Default output value -->
                     </div>
                 </div>
             </div>
@@ -318,9 +338,7 @@ button .fa-solid {
             <div class="search-box">
                 <div class="row">
                     <input type="text" name="course" id="input-box" placeholder="Search for courses" autocomplete="off">
-                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
-
                 <div class="result-box">
                 </div>
             </div>
@@ -347,13 +365,14 @@ button .fa-solid {
 
     <!-- Logged in user information -->
     <?php if (isset($_SESSION['username'])) : ?>
-        <div class="alert alert-info">
-            You're logged in as <strong><?php echo $_SESSION['username']; ?></strong>
+        <div class="alert alert-info" style="z-index: 1;">
+            Logged in as <strong><?php echo $_SESSION['username']; ?></strong>
             <a href="index.php?logout='1'" class="btn btn-danger btn-sm">Logout</a>
         </div>
     <?php endif ?>
 </div>
 
+<p padding="20px"></p>
 
 
 <!-- Include Bootstrap JS for dismissible alerts -->

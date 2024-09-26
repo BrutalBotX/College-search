@@ -98,7 +98,6 @@ if (isset($_POST['login_user'])) {
     echo "No colleges found matching your search.";
   }
 }*/
-// SEARCH COLLEGES
 // SEARCH COLLEGES WITH PAGINATION
 if (isset($_GET["search"])) {
   $search = mysqli_real_escape_string($db, $_GET["search"]);
@@ -196,37 +195,65 @@ if (!empty($selected_facilities)) {
     echo "</div>"; // row
     echo "</div>";
 
-      // Pagination navigation
-      $total_pages = ceil($total_results / $results_per_page);
+// Pagination navigation
+$total_pages = ceil($total_results / $results_per_page);
+$visible_pages = 5; // Number of page links to show around the current page
 
-      if ($total_pages > 1) {
-          echo "<nav aria-label='Page navigation'>";
-          echo "<ul class='pagination justify-content-center mt-4'>";
+if ($total_pages > 1) {
+    echo "<nav aria-label='Page navigation'>";
+    echo "<ul class='pagination justify-content-center mt-4'>";
 
-          // Previous button
-          if ($current_page > 1) {
-              $prev_page = $current_page - 1;
-              echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$prev_page'>Previous</a></li>";
-          }
+    // Previous button
+    if ($current_page > 1) {
+        $prev_page = $current_page - 1;
+        echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$prev_page'>Previous</a></li>";
+    }
 
-          // Page numbers
-          for ($i = 1; $i <= $total_pages; $i++) {
-              if ($i == $current_page) {
-                  echo "<li class='page-item active'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
-              } else {
-                  echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
-              }
-          }
+    // Determine the range of pages to show
+    $start_page = max(1, $current_page - floor($visible_pages / 2));
+    $end_page = min($total_pages, $current_page + floor($visible_pages / 2));
 
-          // Next button
-          if ($current_page < $total_pages) {
-              $next_page = $current_page + 1;
-              echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$next_page'>Next</a></li>";
-          }
+    // Ensure that there are always $visible_pages shown, adjusting start and end if necessary
+    if ($current_page < ceil($visible_pages / 2)) {
+        $end_page = min($total_pages, $visible_pages);
+    } elseif ($current_page > $total_pages - floor($visible_pages / 2)) {
+        $start_page = max(1, $total_pages - $visible_pages + 1);
+    }
 
-          echo "</ul>";
-          echo "</nav>";
-      }
+    // First page button
+    if ($start_page > 1) {
+        echo "<li class='page-item'><a class='page-link' href='?search=$search&page=1'>1</a></li>";
+        if ($start_page > 2) {
+            echo "<li class='page-item disabled'><span class='page-link'>...</span></li>"; // Dots for gap
+        }
+    }
+
+    // Page numbers
+    for ($i = $start_page; $i <= $end_page; $i++) {
+        if ($i == $current_page) {
+            echo "<li class='page-item active'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
+        } else {
+            echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$i'>$i</a></li>";
+        }
+    }
+
+    // Last page button
+    if ($end_page < $total_pages) {
+        if ($end_page < $total_pages - 1) {
+            echo "<li class='page-item disabled'><span class='page-link'>...</span></li>"; // Dots for gap
+        }
+        echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$total_pages'>$total_pages</a></li>";
+    }
+
+    // Next button
+    if ($current_page < $total_pages) {
+        $next_page = $current_page + 1;
+        echo "<li class='page-item'><a class='page-link' href='?search=$search&page=$next_page'>Next</a></li>";
+    }
+
+    echo "</ul>";
+    echo "</nav>";
+}
   } else {
       echo "<div class='alert alert-warning' role='alert'>No colleges found matching your search.</div>";
   }
