@@ -1,11 +1,12 @@
 
-# College Search
+## College Search
 
 This is as site made for Indian students graduating from their school life searching for suitable colleges. This makes that task a bit easier by providing a simple UI for the said task with some filter functonality. 
 
 A website made using basic frontend stack - HTML, css, js 
 and uses php and MySQL for the backend.
 
+[Here's the link!](https://college-search.42web.io/search.php)
 
 ## Screenshots
 
